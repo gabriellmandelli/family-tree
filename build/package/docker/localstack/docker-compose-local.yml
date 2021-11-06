@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  family-tree:
+    build:
+      context: ../../../../
+      dockerfile: build/package/docker/service/Dockerfile
+    image: family-tree:latest
+    container_name: family-tree
+    ports:
+      - "8080:8080"
+      - "8081:8081"
