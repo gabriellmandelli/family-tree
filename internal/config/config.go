@@ -45,7 +45,7 @@ func setDefaults(viperConfig *viper.Viper) {
 	viperConfig.SetDefault("app.name", "family-tree")
 	viperConfig.SetDefault("app.port", ":8080")
 	viperConfig.SetDefault("health.port", ":8081")
-	viperConfig.SetDefault("mongodb.uri", "mongodb://0.0.0.0:27017")
+	viperConfig.SetDefault("mongodb.uri", "mongodb://mongodb:27017")
 	viperConfig.SetDefault("mongodb.username", "test")
 	viperConfig.SetDefault("mongodb.password", "test")
 }
