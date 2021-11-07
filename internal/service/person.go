@@ -10,6 +10,7 @@ import (
 )
 
 type PersonService interface {
+	FindInBatch(ctx *context.Context, personIds []string) ([]model.Person, *errorx.Error)
 	AddPerson(ctx *context.Context, person *model.Person) (*model.Person, *errorx.Error)
 	FindAllPerson(ctx *context.Context, name string) ([]model.Person, *errorx.Error)
 }
@@ -27,24 +28,14 @@ func NewPersonService() PersonService {
 		personRepository: personRespository,
 	}
 }
+func (p *PersonServiceImpl) FindInBatch(ctx *context.Context, personIds []string) ([]model.Person, *errorx.Error) {
+	return p.personRepository.FindInBatch(ctx, personIds)
+}
 
 func (p *PersonServiceImpl) FindAllPerson(ctx *context.Context, name string) ([]model.Person, *errorx.Error) {
-	persons, err := p.personRepository.FindAll(name, 0, 0)
-
-	if err != nil {
-		return nil, errorx.Decorate(err, "Error to find all")
-	}
-
-	return persons, nil
+	return p.personRepository.FindAll(name, 0, 0)
 }
 
 func (p *PersonServiceImpl) AddPerson(ctx *context.Context, person *model.Person) (*model.Person, *errorx.Error) {
-
-	response, err := p.personRepository.Save(person)
-
-	if err != nil {
-		return nil, errorx.Decorate(err, "Error to add person")
-	}
-
-	return response, nil
+	return p.personRepository.Save(person)
 }
