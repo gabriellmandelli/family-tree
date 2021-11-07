@@ -14,6 +14,13 @@ type Configuration struct {
 	AppName    string
 	AppPort    string
 	HealthPort string
+	MongoDB    database
+}
+
+type database struct {
+	URI      string
+	UserName string
+	Password string
 }
 
 func initConfig() *viper.Viper {
@@ -38,7 +45,9 @@ func setDefaults(viperConfig *viper.Viper) {
 	viperConfig.SetDefault("app.name", "family-tree")
 	viperConfig.SetDefault("app.port", ":8080")
 	viperConfig.SetDefault("health.port", ":8081")
-	viperConfig.SetDefault("health.port", ":8081")
+	viperConfig.SetDefault("mongodb.uri", "mongodb://localhost:27017")
+	viperConfig.SetDefault("mongodb.username", "test")
+	viperConfig.SetDefault("mongodb.password", "test")
 }
 
 //GetConfig return Configuration
@@ -49,6 +58,11 @@ func GetConfig() Configuration {
 			AppName:    viperConfig.GetString("app.name"),
 			AppPort:    viperConfig.GetString("app.port"),
 			HealthPort: viperConfig.GetString("health.port"),
+			MongoDB: database{
+				URI:      viperConfig.GetString("mongodb.uri"),
+				UserName: viperConfig.GetString("mongodb.username"),
+				Password: viperConfig.GetString("mongodb.password"),
+			},
 		}
 	})
 	return config
