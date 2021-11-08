@@ -10,6 +10,11 @@ These are some dependencies used in this repository:
 - [Errorx](https://github.com/joomcode/errorx)
 - [Viper](https://github.com/spf13/viper)
 
+## ⚒ Requirements
+- [golang 1.15+](https://golang.org/dl/)
+- [VS Code](https://code.visualstudio.com/)
+- [Insomnia](https://insomnia.rest/)
+
 ## ☕ Running
 
 ### Running with docker:
@@ -67,9 +72,3 @@ curl --request GET \
   --url http://localhost:8080/v1/familytree/61886a0229cb6d591f138653 \
   --header 'Content-Type: application/json'
 ```
-
----
-## ⚒ Requirements
-- [golang 1.15+](https://golang.org/dl/)
-- [VS Code](https://code.visualstudio.com/)
-- [Insomnia](https://insomnia.rest/)
