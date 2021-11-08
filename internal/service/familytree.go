@@ -34,6 +34,7 @@ func (ft *FamilyTreeServiceImpl) GetFamilyTree(ctx *context.Context, personID st
 	}
 
 	ft.parentsOfParents(&familyTree.Members, personID, queryPerson, relationsShips)
+	ft.childrenOfChildres(&familyTree.Members, personID, queryPerson, relationsShips)
 
 	personData, errx := ft.personService.FindInBatch(ctx, queryPerson)
 
@@ -46,17 +47,30 @@ func (ft *FamilyTreeServiceImpl) GetFamilyTree(ctx *context.Context, personID st
 	return &familyTree, nil
 }
 
-func (ft *FamilyTreeServiceImpl) parentsOfParents(member *model.Members, childrenID string, queryPerson []string, relationsShips []model.RelationShip) {
-	member.ID = childrenID
+func (ft *FamilyTreeServiceImpl) parentsOfParents(member *model.Members, memberID string, queryPerson []string, relationsShips []model.RelationShip) {
+	member.ID = memberID
 	member.Parents = make([]model.Members, 0)
-	member.Childrens = make([]model.Members, 0)
-	queryPerson = append(queryPerson, childrenID)
+	queryPerson = append(queryPerson, memberID)
 	for _, relation := range relationsShips {
-		if childrenID == relation.ChildrenID.Hex() {
+		if memberID == relation.ChildrenID.Hex() {
 			parent := model.Members{}
 			parent.ID = relation.ParentID.Hex()
 			ft.parentsOfParents(&parent, parent.ID, queryPerson, relationsShips)
 			member.Parents = append(member.Parents, parent)
+		}
+	}
+}
+
+func (ft *FamilyTreeServiceImpl) childrenOfChildres(member *model.Members, memberID string, queryPerson []string, relationsShips []model.RelationShip) {
+	member.ID = memberID
+	member.Childrens = make([]model.Members, 0)
+	queryPerson = append(queryPerson, memberID)
+	for _, relation := range relationsShips {
+		if memberID == relation.ParentID.Hex() {
+			children := model.Members{}
+			children.ID = relation.ChildrenID.Hex()
+			ft.childrenOfChildres(&children, children.ID, queryPerson, relationsShips)
+			member.Childrens = append(member.Childrens, children)
 		}
 	}
 }
@@ -69,5 +83,9 @@ func (ft *FamilyTreeServiceImpl) updatePersonInfo(members *model.Members, person
 	}
 	for i := range members.Parents {
 		ft.updatePersonInfo(&members.Parents[i], personData)
+	}
+
+	for i := range members.Childrens {
+		ft.updatePersonInfo(&members.Childrens[i], personData)
 	}
 }
