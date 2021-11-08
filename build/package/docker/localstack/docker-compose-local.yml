@@ -1,6 +1,16 @@
 version: "3"
 
 services:
+  mongodb:
+    image: mongo:4.1.13
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: test
+      MONGO_INITDB_ROOT_PASSWORD: test
+    deploy:
+      replicas: 1
+    ports:
+      - 27017:27017
   family-tree:
     build:
       context: ../../../../
@@ -10,3 +20,5 @@ services:
     ports:
       - "8080:8080"
       - "8081:8081"
+    depends_on:
+      - "mongodb"

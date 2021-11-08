@@ -15,6 +15,8 @@ func main() {
 	server := router.NewRouter()
 
 	api.NewPersonAPI().Register(server)
+	api.NewRelationShipAPI().Register(server)
+	api.NewFamilyTreeAPI().Register(server)
 
 	go func() {
 		server.Logger.Fatal(server.Start(config.GetConfig().AppPort))

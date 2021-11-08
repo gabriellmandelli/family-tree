@@ -9,38 +9,37 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//PersonAPI struct
-type PersonAPI struct {
-	personService service.PersonService
+//RelationShipAPI struct
+type RelationShipAPI struct {
+	rsService service.RelationShipService
 }
 
-//NewPersonAPI return Person api
-func NewPersonAPI() *PersonAPI {
-	return &PersonAPI{
-		personService: service.NewPersonService(),
+//NewRelationShipAPI return Person api
+func NewRelationShipAPI() *RelationShipAPI {
+	return &RelationShipAPI{
+		rsService: service.NewRelationShipService(),
 	}
 }
 
 const (
-	personBaseUrl = "/person"
+	relationShipBaseUrl = "/relationship"
 )
 
 //Register register controllers
-func (controller *PersonAPI) Register(server *echo.Echo) {
+func (controller *RelationShipAPI) Register(server *echo.Echo) {
 	v1 := server.Group("v1")
-	v1.GET(personBaseUrl, controller.findAll)
-	v1.POST(personBaseUrl, controller.addPerson)
-	v1.PUT(personBaseUrl+"/:personID", controller.addPerson)
+	v1.GET(relationShipBaseUrl, controller.findAll)
+	v1.POST(relationShipBaseUrl, controller.add)
 }
 
-func (api *PersonAPI) findAll(echoCtx echo.Context) error {
+func (api *RelationShipAPI) findAll(echoCtx echo.Context) error {
 	ctx, _, errx := util.InitializeContext(echoCtx, nil)
 
 	if errx != nil {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
 	}
 
-	person, errx := api.personService.FindAllPerson(ctx, "")
+	person, errx := api.rsService.FindAll(ctx, "", "")
 
 	if errx != nil {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
@@ -49,8 +48,8 @@ func (api *PersonAPI) findAll(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusOK, person)
 }
 
-func (api *PersonAPI) addPerson(echoCtx echo.Context) error {
-	requestBody := model.Person{}
+func (api *RelationShipAPI) add(echoCtx echo.Context) error {
+	requestBody := model.RelationShip{}
 
 	ctx, _, errx := util.InitializeContext(echoCtx, &requestBody)
 
@@ -58,11 +57,11 @@ func (api *PersonAPI) addPerson(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
 	}
 
-	person, errx := api.personService.AddPerson(ctx, &requestBody)
+	relationShip, errx := api.rsService.Add(ctx, &requestBody)
 
 	if errx != nil {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
 	}
 
-	return echoCtx.JSON(http.StatusOK, person)
+	return echoCtx.JSON(http.StatusOK, relationShip)
 }
