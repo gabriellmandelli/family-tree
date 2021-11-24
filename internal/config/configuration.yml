@@ -3,3 +3,7 @@ app:
   port: :8080
 health:
   port: :8081
+mongodb:
+  uri: mongodb://0.0.0.0:27017
+  username: test
+  password: test
