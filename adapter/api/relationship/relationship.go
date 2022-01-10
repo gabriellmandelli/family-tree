@@ -1,23 +1,22 @@
-package api
+package relationship
 
 import (
 	"net/http"
 
-	"github.com/gabriellmandelli/family-tree/internal/model"
-	"github.com/gabriellmandelli/family-tree/internal/service"
-	"github.com/gabriellmandelli/family-tree/internal/util"
+	"github.com/gabriellmandelli/family-tree/businers/relationship"
+	util "github.com/gabriellmandelli/family-tree/foundation/context"
 	"github.com/labstack/echo/v4"
 )
 
 //RelationShipAPI struct
 type RelationShipAPI struct {
-	rsService service.RelationShipService
+	rsService relationship.RelationShipService
 }
 
 //NewRelationShipAPI return Person api
 func NewRelationShipAPI() *RelationShipAPI {
 	return &RelationShipAPI{
-		rsService: service.NewRelationShipService(),
+		rsService: relationship.NewRelationShipService(),
 	}
 }
 
@@ -49,7 +48,7 @@ func (api *RelationShipAPI) findAll(echoCtx echo.Context) error {
 }
 
 func (api *RelationShipAPI) add(echoCtx echo.Context) error {
-	requestBody := model.RelationShip{}
+	requestBody := relationship.RelationShip{}
 
 	ctx, _, errx := util.InitializeContext(echoCtx, &requestBody)
 

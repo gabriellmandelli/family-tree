@@ -1,7 +1,8 @@
-package database
+package relationship
 
 import (
-	"github.com/gabriellmandelli/family-tree/internal/model"
+	"context"
+
 	"github.com/joomcode/errorx"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -15,10 +16,10 @@ const (
 
 type RelationShipRepository interface {
 	Count() (int64, *errorx.Error)
-	FindAll(childrenID string, limit int64, offset int64) ([]model.RelationShip, *errorx.Error)
-	FindById(id string) (*model.RelationShip, *errorx.Error)
-	Save(payload *model.RelationShip) (*model.RelationShip, *errorx.Error)
-	Update(id string, payload *model.RelationShip) (*model.RelationShip, *errorx.Error)
+	FindAll(childrenID string, limit int64, offset int64) ([]RelationShip, *errorx.Error)
+	FindById(id string) (*RelationShip, *errorx.Error)
+	Save(payload *RelationShip) (*RelationShip, *errorx.Error)
+	Update(id string, payload *RelationShip) (*RelationShip, *errorx.Error)
 	Delete(id string) *errorx.Error
 }
 
@@ -31,7 +32,7 @@ func NewRelationShipRepository(Connection *mongo.Database) *RelationShipReposito
 }
 
 func (pr *RelationShipRepositoryImpl) Count() (int64, *errorx.Error) {
-	countRecord, err := pr.Connection.Collection(relationShipCollection).CountDocuments(cntx, bson.M{}, nil)
+	countRecord, err := pr.Connection.Collection(relationShipCollection).CountDocuments(context.TODO(), bson.M{}, nil)
 
 	if err != nil {
 		return 0, errorx.Decorate(err, "Database error")
@@ -40,10 +41,10 @@ func (pr *RelationShipRepositoryImpl) Count() (int64, *errorx.Error) {
 	return countRecord, nil
 }
 
-func (pr *RelationShipRepositoryImpl) FindAll(parentID string, childrenID string, limit int64, offset int64) ([]model.RelationShip, *errorx.Error) {
+func (pr *RelationShipRepositoryImpl) FindAll(parentID string, childrenID string, limit int64, offset int64) ([]RelationShip, *errorx.Error) {
 	var (
-		person        model.RelationShip
-		persons       []model.RelationShip
+		person        RelationShip
+		persons       []RelationShip
 		filterOptions = options.Find()
 		csr           *mongo.Cursor
 		err           error
@@ -64,13 +65,13 @@ func (pr *RelationShipRepositoryImpl) FindAll(parentID string, childrenID string
 		query = bson.M{}
 	}
 
-	csr, err = pr.Connection.Collection(relationShipCollection).Find(cntx, query, filterOptions)
+	csr, err = pr.Connection.Collection(relationShipCollection).Find(context.TODO(), query, filterOptions)
 
 	if err != nil {
 		return nil, errorx.Decorate(err, "Database error")
 	}
 
-	for csr.Next(cntx) {
+	for csr.Next(context.TODO()) {
 		err := csr.Decode(&person)
 
 		if err != nil {
@@ -83,14 +84,14 @@ func (pr *RelationShipRepositoryImpl) FindAll(parentID string, childrenID string
 	return persons, nil
 }
 
-func (pr *RelationShipRepositoryImpl) FindById(id string) (*model.RelationShip, *errorx.Error) {
+func (pr *RelationShipRepositoryImpl) FindById(id string) (*RelationShip, *errorx.Error) {
 	var (
-		person      model.RelationShip
+		person      RelationShip
 		personId, _ = primitive.ObjectIDFromHex(id)
 		filter      = bson.M{"_id": personId}
 	)
 
-	err := pr.Connection.Collection(relationShipCollection).FindOne(cntx, filter).Decode(&person)
+	err := pr.Connection.Collection(relationShipCollection).FindOne(context.TODO(), filter).Decode(&person)
 
 	if err != nil {
 		return nil, errorx.Decorate(err, "Database error")
@@ -99,8 +100,8 @@ func (pr *RelationShipRepositoryImpl) FindById(id string) (*model.RelationShip, 
 	return &person, nil
 }
 
-func (pr *RelationShipRepositoryImpl) Save(payload *model.RelationShip) (*model.RelationShip, *errorx.Error) {
-	_, err := pr.Connection.Collection(relationShipCollection).InsertOne(cntx, payload)
+func (pr *RelationShipRepositoryImpl) Save(payload *RelationShip) (*RelationShip, *errorx.Error) {
+	_, err := pr.Connection.Collection(relationShipCollection).InsertOne(context.TODO(), payload)
 
 	if err != nil {
 		return nil, errorx.Decorate(err, "Database error")
@@ -109,7 +110,7 @@ func (pr *RelationShipRepositoryImpl) Save(payload *model.RelationShip) (*model.
 	return payload, nil
 }
 
-func (pr *RelationShipRepositoryImpl) Update(id string, payload *model.RelationShip) (*model.RelationShip, *errorx.Error) {
+func (pr *RelationShipRepositoryImpl) Update(id string, payload *RelationShip) (*RelationShip, *errorx.Error) {
 	objectID, _ := primitive.ObjectIDFromHex(id)
 
 	filter := bson.M{
@@ -122,7 +123,7 @@ func (pr *RelationShipRepositoryImpl) Update(id string, payload *model.RelationS
 			"children_id": payload.ChildrenID,
 		}}
 
-	_, err := pr.Connection.Collection(relationShipCollection).UpdateOne(cntx, filter, updateField)
+	_, err := pr.Connection.Collection(relationShipCollection).UpdateOne(context.TODO(), filter, updateField)
 
 	if err != nil {
 		return nil, errorx.Decorate(err, "Database error")
@@ -136,7 +137,7 @@ func (pr *RelationShipRepositoryImpl) Delete(id string) error {
 
 	filter := bson.M{"_id": objectID}
 
-	_, err := pr.Connection.Collection(relationShipCollection).DeleteOne(cntx, filter)
+	_, err := pr.Connection.Collection(relationShipCollection).DeleteOne(context.TODO(), filter)
 
 	if err != nil {
 		return errorx.Decorate(err, "Database error")

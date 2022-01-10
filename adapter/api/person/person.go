@@ -1,23 +1,22 @@
-package api
+package person
 
 import (
 	"net/http"
 
-	"github.com/gabriellmandelli/family-tree/internal/model"
-	"github.com/gabriellmandelli/family-tree/internal/service"
-	"github.com/gabriellmandelli/family-tree/internal/util"
+	"github.com/gabriellmandelli/family-tree/businers/person"
+	util "github.com/gabriellmandelli/family-tree/foundation/context"
 	"github.com/labstack/echo/v4"
 )
 
 //PersonAPI struct
 type PersonAPI struct {
-	personService service.PersonService
+	personService person.PersonService
 }
 
 //NewPersonAPI return Person api
 func NewPersonAPI() *PersonAPI {
 	return &PersonAPI{
-		personService: service.NewPersonService(),
+		personService: person.NewPersonService(),
 	}
 }
 
@@ -50,7 +49,7 @@ func (api *PersonAPI) findAll(echoCtx echo.Context) error {
 }
 
 func (api *PersonAPI) addPerson(echoCtx echo.Context) error {
-	requestBody := model.Person{}
+	requestBody := person.Person{}
 
 	ctx, _, errx := util.InitializeContext(echoCtx, &requestBody)
 

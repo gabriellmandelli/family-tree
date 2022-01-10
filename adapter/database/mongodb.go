@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/gabriellmandelli/family-tree/internal/config"
+	"github.com/gabriellmandelli/family-tree/adapter/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )

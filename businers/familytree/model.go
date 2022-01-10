@@ -1,4 +1,4 @@
-package model
+package familytree
 
 type FamilyTree struct {
 	Members Members `json:"members"`
