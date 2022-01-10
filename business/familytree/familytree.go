@@ -1,30 +1,31 @@
-package service
+package familytree
 
 import (
 	"context"
 
-	"github.com/gabriellmandelli/family-tree/internal/model"
+	"github.com/gabriellmandelli/family-tree/business/person"
+	"github.com/gabriellmandelli/family-tree/business/relationship"
 	"github.com/joomcode/errorx"
 )
 
 type FamilyTreeService interface {
-	GetFamilyTree(ctx *context.Context, personID string) (*model.FamilyTree, *errorx.Error)
+	GetFamilyTree(ctx context.Context, personID string) (*FamilyTree, *errorx.Error)
 }
 
 type FamilyTreeServiceImpl struct {
-	personService       PersonService
-	relationShipService RelationShipService
+	personService       person.PersonService
+	relationShipService relationship.RelationShipService
 }
 
 func NewFamilyTreeService() FamilyTreeService {
 	return &FamilyTreeServiceImpl{
-		personService:       NewPersonService(),
-		relationShipService: NewRelationShipService(),
+		personService:       person.NewPersonService(),
+		relationShipService: relationship.NewRelationShipService(),
 	}
 }
 
-func (ft *FamilyTreeServiceImpl) GetFamilyTree(ctx *context.Context, personID string) (*model.FamilyTree, *errorx.Error) {
-	familyTree := model.FamilyTree{}
+func (ft *FamilyTreeServiceImpl) GetFamilyTree(ctx context.Context, personID string) (*FamilyTree, *errorx.Error) {
+	familyTree := FamilyTree{}
 	queryPerson := []string{}
 
 	relationsShips, errx := ft.relationShipService.FindAll(ctx, "", "")
@@ -47,13 +48,13 @@ func (ft *FamilyTreeServiceImpl) GetFamilyTree(ctx *context.Context, personID st
 	return &familyTree, nil
 }
 
-func (ft *FamilyTreeServiceImpl) parentsOfParents(member *model.Members, memberID string, queryPerson []string, relationsShips []model.RelationShip) {
+func (ft *FamilyTreeServiceImpl) parentsOfParents(member *Members, memberID string, queryPerson []string, relationsShips []relationship.RelationShip) {
 	member.ID = memberID
-	member.Parents = make([]model.Members, 0)
+	member.Parents = make([]Members, 0)
 	queryPerson = append(queryPerson, memberID)
 	for _, relation := range relationsShips {
 		if memberID == relation.ChildrenID.Hex() {
-			parent := model.Members{}
+			parent := Members{}
 			parent.ID = relation.ParentID.Hex()
 			ft.parentsOfParents(&parent, parent.ID, queryPerson, relationsShips)
 			member.Parents = append(member.Parents, parent)
@@ -61,13 +62,13 @@ func (ft *FamilyTreeServiceImpl) parentsOfParents(member *model.Members, memberI
 	}
 }
 
-func (ft *FamilyTreeServiceImpl) childrenOfChildres(member *model.Members, memberID string, queryPerson []string, relationsShips []model.RelationShip) {
+func (ft *FamilyTreeServiceImpl) childrenOfChildres(member *Members, memberID string, queryPerson []string, relationsShips []relationship.RelationShip) {
 	member.ID = memberID
-	member.Childrens = make([]model.Members, 0)
+	member.Childrens = make([]Members, 0)
 	queryPerson = append(queryPerson, memberID)
 	for _, relation := range relationsShips {
 		if memberID == relation.ParentID.Hex() {
-			children := model.Members{}
+			children := Members{}
 			children.ID = relation.ChildrenID.Hex()
 			ft.childrenOfChildres(&children, children.ID, queryPerson, relationsShips)
 			member.Childrens = append(member.Childrens, children)
@@ -75,7 +76,7 @@ func (ft *FamilyTreeServiceImpl) childrenOfChildres(member *model.Members, membe
 	}
 }
 
-func (ft *FamilyTreeServiceImpl) updatePersonInfo(members *model.Members, personData []model.Person) {
+func (ft *FamilyTreeServiceImpl) updatePersonInfo(members *Members, personData []person.Person) {
 	for i := range personData {
 		if members.ID == personData[i].ID.Hex() {
 			members.Name = personData[i].Name

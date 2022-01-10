@@ -3,22 +3,18 @@ package util
 import (
 	"context"
 
-	"github.com/gabriellmandelli/family-tree/internal/model"
+	"github.com/gabriellmandelli/family-tree/foundation/model"
 	"github.com/joomcode/errorx"
 	"github.com/labstack/echo/v4"
 )
 
 type loggerKeyType string
 
-const (
-	requestDataKey loggerKeyType = "requestDataKey"
-)
-
 func getContext(c echo.Context) context.Context {
 	return c.Request().Context()
 }
 
-func InitializeContext(echoCtx echo.Context, body interface{}) (*context.Context, *model.RequestData, *errorx.Error) {
+func InitializeContext(echoCtx echo.Context, body interface{}) (context.Context, *model.RequestData, *errorx.Error) {
 	var errx *errorx.Error
 
 	ctx := getContext(echoCtx)
@@ -35,7 +31,5 @@ func InitializeContext(echoCtx echo.Context, body interface{}) (*context.Context
 		QueryParams: echoCtx.QueryParams(),
 	}
 
-	ctx = context.WithValue(ctx, requestDataKey, requestData)
-
-	return &ctx, &requestData, errx
+	return ctx, &requestData, errx
 }

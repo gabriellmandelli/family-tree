@@ -5,29 +5,32 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gabriellmandelli/family-tree/internal/api"
-	"github.com/gabriellmandelli/family-tree/internal/config"
-	"github.com/gabriellmandelli/family-tree/internal/router"
+	"github.com/gabriellmandelli/family-tree/adapter/api/familytree"
+	"github.com/gabriellmandelli/family-tree/adapter/api/health"
+	"github.com/gabriellmandelli/family-tree/adapter/api/person"
+	"github.com/gabriellmandelli/family-tree/adapter/api/relationship"
+	"github.com/gabriellmandelli/family-tree/adapter/config"
+	"github.com/gabriellmandelli/family-tree/adapter/router"
 )
 
 func main() {
 
 	server := router.NewRouter()
 
-	api.NewPersonAPI().Register(server)
-	api.NewRelationShipAPI().Register(server)
-	api.NewFamilyTreeAPI().Register(server)
+	person.NewPersonAPI().Register(server)
+	relationship.NewRelationShipAPI().Register(server)
+	familytree.NewFamilyTreeAPI().Register(server)
 
 	go func() {
 		server.Logger.Fatal(server.Start(config.GetConfig().AppPort))
 	}()
 
-	health := router.NewRouter()
+	healthCheck := router.NewRouter()
 
-	api.NewHealthCheckAPI().Register(health)
+	health.NewHealthCheckAPI().Register(healthCheck)
 
 	go func() {
-		health.Logger.Fatal(health.Start(config.GetConfig().HealthPort))
+		healthCheck.Logger.Fatal(healthCheck.Start(config.GetConfig().HealthPort))
 	}()
 
 	osSignalChan := make(chan os.Signal, 2)

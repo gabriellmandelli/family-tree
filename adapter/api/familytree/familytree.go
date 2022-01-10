@@ -1,22 +1,22 @@
-package api
+package familytree
 
 import (
 	"net/http"
 
-	"github.com/gabriellmandelli/family-tree/internal/service"
-	"github.com/gabriellmandelli/family-tree/internal/util"
+	"github.com/gabriellmandelli/family-tree/business/familytree"
+	util "github.com/gabriellmandelli/family-tree/foundation/context"
 	"github.com/labstack/echo/v4"
 )
 
 //FamilyTreeAPI struct
 type FamilyTreeAPI struct {
-	rsService service.FamilyTreeService
+	rsService familytree.FamilyTreeService
 }
 
 //NewFamilyTreeAPI return Person api
 func NewFamilyTreeAPI() *FamilyTreeAPI {
 	return &FamilyTreeAPI{
-		rsService: service.NewFamilyTreeService(),
+		rsService: familytree.NewFamilyTreeService(),
 	}
 }
 
