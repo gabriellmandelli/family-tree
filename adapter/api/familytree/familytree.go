@@ -14,9 +14,9 @@ type FamilyTreeAPI struct {
 }
 
 //NewFamilyTreeAPI return Person api
-func NewFamilyTreeAPI() *FamilyTreeAPI {
+func NewFamilyTreeAPI(familytreeService familytree.FamilyTreeService) *FamilyTreeAPI {
 	return &FamilyTreeAPI{
-		rsService: familytree.NewFamilyTreeService(),
+		rsService: familytreeService,
 	}
 }
 

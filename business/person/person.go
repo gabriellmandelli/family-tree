@@ -3,8 +3,6 @@ package person
 import (
 	"context"
 
-	"github.com/gabriellmandelli/family-tree/adapter/config"
-	"github.com/gabriellmandelli/family-tree/adapter/database"
 	"github.com/joomcode/errorx"
 )
 
@@ -15,16 +13,12 @@ type PersonService interface {
 }
 
 type PersonServiceImpl struct {
-	personRepository *PersonRepositoryImpl
+	personRepository PersonRepository
 }
 
-func NewPersonService() PersonService {
-
-	db, _ := database.NewMongoDbClient(context.TODO(), config.GetConfig())
-	personRespository := NewPersonRepository(db)
-
+func NewPersonService(r PersonRepository) PersonService {
 	return &PersonServiceImpl{
-		personRepository: personRespository,
+		personRepository: r,
 	}
 }
 func (p *PersonServiceImpl) FindInBatch(ctx context.Context, personIds []string) ([]Person, *errorx.Error) {

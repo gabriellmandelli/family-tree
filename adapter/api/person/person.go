@@ -14,9 +14,9 @@ type PersonAPI struct {
 }
 
 //NewPersonAPI return Person api
-func NewPersonAPI() *PersonAPI {
+func NewPersonAPI(personService person.PersonService) *PersonAPI {
 	return &PersonAPI{
-		personService: person.NewPersonService(),
+		personService: personService,
 	}
 }
 

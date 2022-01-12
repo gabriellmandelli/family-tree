@@ -16,7 +16,7 @@ const (
 
 type RelationShipRepository interface {
 	Count() (int64, *errorx.Error)
-	FindAll(childrenID string, limit int64, offset int64) ([]RelationShip, *errorx.Error)
+	FindAll(parentID string, childrenID string, limit int64, offset int64) ([]RelationShip, *errorx.Error)
 	FindById(id string) (*RelationShip, *errorx.Error)
 	Save(payload *RelationShip) (*RelationShip, *errorx.Error)
 	Update(id string, payload *RelationShip) (*RelationShip, *errorx.Error)
@@ -27,7 +27,7 @@ type RelationShipRepositoryImpl struct {
 	Connection *mongo.Database
 }
 
-func NewRelationShipRepository(Connection *mongo.Database) *RelationShipRepositoryImpl {
+func NewRelationShipRepository(Connection *mongo.Database) RelationShipRepository {
 	return &RelationShipRepositoryImpl{Connection: Connection}
 }
 
@@ -132,7 +132,7 @@ func (pr *RelationShipRepositoryImpl) Update(id string, payload *RelationShip) (
 	return payload, nil
 }
 
-func (pr *RelationShipRepositoryImpl) Delete(id string) error {
+func (pr *RelationShipRepositoryImpl) Delete(id string) *errorx.Error {
 	objectID, _ := primitive.ObjectIDFromHex(id)
 
 	filter := bson.M{"_id": objectID}

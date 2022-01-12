@@ -14,9 +14,9 @@ type RelationShipAPI struct {
 }
 
 //NewRelationShipAPI return Person api
-func NewRelationShipAPI() *RelationShipAPI {
+func NewRelationShipAPI(relationShipService relationship.RelationShipService) *RelationShipAPI {
 	return &RelationShipAPI{
-		rsService: relationship.NewRelationShipService(),
+		rsService: relationShipService,
 	}
 }
 
