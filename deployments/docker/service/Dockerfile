@@ -16,6 +16,6 @@ RUN apk --no-cache add tzdata
 WORKDIR /app
 USER 1000
 COPY --from=build /build/family-tree .
-ADD build/package/docker/service/entrypoint.sh /
+ADD deployments/docker/service/entrypoint.sh /
 
 ENTRYPOINT [ "/entrypoint.sh" ]

@@ -8,15 +8,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//RelationShipAPI struct
-type RelationShipAPI struct {
+//RelationShip struct
+type RelationShip struct {
 	rsService relationship.RelationShipService
 }
 
-//NewRelationShipAPI return Person api
-func NewRelationShipAPI() *RelationShipAPI {
-	return &RelationShipAPI{
-		rsService: relationship.NewRelationShipService(),
+//NewRelationShipHttp return RelationShip rs
+func NewRelationShipHttp(relationShipService relationship.RelationShipService) *RelationShip {
+	return &RelationShip{
+		rsService: relationShipService,
 	}
 }
 
@@ -25,20 +25,20 @@ const (
 )
 
 //Register register controllers
-func (controller *RelationShipAPI) Register(server *echo.Echo) {
+func (controller *RelationShip) Register(server *echo.Echo) {
 	v1 := server.Group("v1")
 	v1.GET(relationShipBaseUrl, controller.findAll)
 	v1.POST(relationShipBaseUrl, controller.add)
 }
 
-func (api *RelationShipAPI) findAll(echoCtx echo.Context) error {
+func (rs *RelationShip) findAll(echoCtx echo.Context) error {
 	ctx, _, errx := util.InitializeContext(echoCtx, nil)
 
 	if errx != nil {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
 	}
 
-	person, errx := api.rsService.FindAll(ctx, "", "")
+	person, errx := rs.rsService.FindAll(ctx, "", "")
 
 	if errx != nil {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
@@ -47,7 +47,7 @@ func (api *RelationShipAPI) findAll(echoCtx echo.Context) error {
 	return echoCtx.JSON(http.StatusOK, person)
 }
 
-func (api *RelationShipAPI) add(echoCtx echo.Context) error {
+func (rs *RelationShip) add(echoCtx echo.Context) error {
 	requestBody := relationship.RelationShip{}
 
 	ctx, _, errx := util.InitializeContext(echoCtx, &requestBody)
@@ -56,7 +56,7 @@ func (api *RelationShipAPI) add(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
 	}
 
-	relationShip, errx := api.rsService.Add(ctx, &requestBody)
+	relationShip, errx := rs.rsService.Add(ctx, &requestBody)
 
 	if errx != nil {
 		return echoCtx.JSON(http.StatusBadRequest, nil)

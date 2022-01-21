@@ -8,15 +8,15 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//FamilyTreeAPI struct
-type FamilyTreeAPI struct {
+//FamilyTree struct
+type FamilyTree struct {
 	rsService familytree.FamilyTreeService
 }
 
-//NewFamilyTreeAPI return Person api
-func NewFamilyTreeAPI() *FamilyTreeAPI {
-	return &FamilyTreeAPI{
-		rsService: familytree.NewFamilyTreeService(),
+//NewFamilyTree return Person ft
+func NewFamilyTreeHttp(familytreeService familytree.FamilyTreeService) *FamilyTree {
+	return &FamilyTree{
+		rsService: familytreeService,
 	}
 }
 
@@ -25,12 +25,12 @@ const (
 )
 
 //Register register controllers
-func (api *FamilyTreeAPI) Register(server *echo.Echo) {
+func (ft *FamilyTree) Register(server *echo.Echo) {
 	v1 := server.Group("v1")
-	v1.GET(familyTreeBaseUrl+"/:personID", api.findAll)
+	v1.GET(familyTreeBaseUrl+"/:personID", ft.findAll)
 }
 
-func (api *FamilyTreeAPI) findAll(echoCtx echo.Context) error {
+func (ft *FamilyTree) findAll(echoCtx echo.Context) error {
 	ctx, _, errx := util.InitializeContext(echoCtx, nil)
 
 	personID := echoCtx.Param("personID")
@@ -39,7 +39,7 @@ func (api *FamilyTreeAPI) findAll(echoCtx echo.Context) error {
 		return echoCtx.JSON(http.StatusBadRequest, nil)
 	}
 
-	person, errx := api.rsService.GetFamilyTree(ctx, personID)
+	person, errx := ft.rsService.GetFamilyTree(ctx, personID)
 
 	if errx != nil {
 		return echoCtx.JSON(http.StatusBadRequest, nil)

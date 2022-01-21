@@ -28,7 +28,7 @@ type PersonRepositoryImpl struct {
 	Connection *mongo.Database
 }
 
-func NewPersonRepository(Connection *mongo.Database) *PersonRepositoryImpl {
+func NewPersonRepository(Connection *mongo.Database) PersonRepository {
 	return &PersonRepositoryImpl{Connection: Connection}
 }
 

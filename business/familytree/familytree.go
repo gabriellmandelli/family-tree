@@ -17,10 +17,10 @@ type FamilyTreeServiceImpl struct {
 	relationShipService relationship.RelationShipService
 }
 
-func NewFamilyTreeService() FamilyTreeService {
+func NewFamilyTreeService(personService person.PersonService, relationShipService relationship.RelationShipService) FamilyTreeService {
 	return &FamilyTreeServiceImpl{
-		personService:       person.NewPersonService(),
-		relationShipService: relationship.NewRelationShipService(),
+		personService:       personService,
+		relationShipService: relationShipService,
 	}
 }
 

@@ -3,8 +3,6 @@ package relationship
 import (
 	"context"
 
-	"github.com/gabriellmandelli/family-tree/adapter/config"
-	"github.com/gabriellmandelli/family-tree/adapter/database"
 	"github.com/joomcode/errorx"
 )
 
@@ -14,14 +12,12 @@ type RelationShipService interface {
 }
 
 type RelationShipServiceImpl struct {
-	relationShipRepository *RelationShipRepositoryImpl
+	relationShipRepository RelationShipRepository
 }
 
-func NewRelationShipService() RelationShipService {
-	db, _ := database.NewMongoDbClient(context.TODO(), config.GetConfig())
-	rsRespository := NewRelationShipRepository(db)
+func NewRelationShipService(r RelationShipRepository) RelationShipService {
 	return &RelationShipServiceImpl{
-		relationShipRepository: rsRespository,
+		relationShipRepository: r,
 	}
 }
 
