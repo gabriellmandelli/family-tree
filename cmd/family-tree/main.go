@@ -6,16 +6,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gabriellmandelli/family-tree/adapter/api/familytree"
-	"github.com/gabriellmandelli/family-tree/adapter/api/health"
-	"github.com/gabriellmandelli/family-tree/adapter/api/person"
-	"github.com/gabriellmandelli/family-tree/adapter/api/relationship"
 	"github.com/gabriellmandelli/family-tree/adapter/config"
 	"github.com/gabriellmandelli/family-tree/adapter/database"
+	familyTreeHttp "github.com/gabriellmandelli/family-tree/adapter/http/familytree"
+	"github.com/gabriellmandelli/family-tree/adapter/http/health"
+	personHttp "github.com/gabriellmandelli/family-tree/adapter/http/person"
+	relationShipHttp "github.com/gabriellmandelli/family-tree/adapter/http/relationship"
 	"github.com/gabriellmandelli/family-tree/adapter/router"
-	familytreeBusiness "github.com/gabriellmandelli/family-tree/business/familytree"
-	personBusiness "github.com/gabriellmandelli/family-tree/business/person"
-	relationshipBusiness "github.com/gabriellmandelli/family-tree/business/relationship"
+	"github.com/gabriellmandelli/family-tree/business/familytree"
+	"github.com/gabriellmandelli/family-tree/business/person"
+	"github.com/gabriellmandelli/family-tree/business/relationship"
 )
 
 func main() {
@@ -28,26 +28,26 @@ func main() {
 	db, _ := database.NewMongoDbClient(context.TODO(), cfg)
 
 	//Repository
-	personRepository := personBusiness.NewPersonRepository(db)
-	relationshipRepository := relationshipBusiness.NewRelationShipRepository(db)
+	personRepository := person.NewPersonRepository(db)
+	relationshipRepository := relationship.NewRelationShipRepository(db)
 
 	//Service
-	personService := personBusiness.NewPersonService(personRepository)
-	relationshipService := relationshipBusiness.NewRelationShipService(relationshipRepository)
-	familyTreeService := familytreeBusiness.NewFamilyTreeService(personService, relationshipService)
+	personService := person.NewPersonService(personRepository)
+	relationshipService := relationship.NewRelationShipService(relationshipRepository)
+	familyTreeService := familytree.NewFamilyTreeService(personService, relationshipService)
 
 	//Http
-	personApi := person.NewPersonAPI(personService)
-	relationshipApi := relationship.NewRelationShipAPI(relationshipService)
-	familytreeApi := familytree.NewFamilyTreeAPI(familyTreeService)
+	personHttp := personHttp.NewPersonHttp(personService)
+	relationshipHttp := relationShipHttp.NewRelationShipHttp(relationshipService)
+	familytreeHttp := familyTreeHttp.NewFamilyTreeHttp(familyTreeService)
 
 	//Router
 	server := router.NewRouter()
 
 	//Register
-	personApi.Register(server)
-	relationshipApi.Register(server)
-	familytreeApi.Register(server)
+	personHttp.Register(server)
+	relationshipHttp.Register(server)
+	familytreeHttp.Register(server)
 
 	go func() {
 		server.Logger.Fatal(server.Start(cfg.AppName))
@@ -55,7 +55,7 @@ func main() {
 
 	healthCheck := router.NewRouter()
 
-	health.NewHealthCheckAPI().Register(healthCheck)
+	health.NewHealthCheckHttp().Register(healthCheck)
 
 	go func() {
 		healthCheck.Logger.Fatal(healthCheck.Start(cfg.HealthPort))
