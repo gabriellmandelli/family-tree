@@ -56,9 +56,9 @@ func (pr *RelationShipRepositoryImpl) FindAll(parentID string, childrenID string
 
 	switch true {
 	case parentID != "" && childrenID != "":
-		query = bson.M{"_id": parentID, "children_id": childrenID}
+		query = bson.M{"parent_id": parentID, "children_id": childrenID}
 	case parentID != "":
-		query = bson.M{"_id": parentID}
+		query = bson.M{"parent_id": parentID}
 	case childrenID != "":
 		query = bson.M{"children_id": childrenID}
 	default:
@@ -86,9 +86,9 @@ func (pr *RelationShipRepositoryImpl) FindAll(parentID string, childrenID string
 
 func (pr *RelationShipRepositoryImpl) FindById(id string) (*RelationShip, *errorx.Error) {
 	var (
-		person      RelationShip
-		personId, _ = primitive.ObjectIDFromHex(id)
-		filter      = bson.M{"_id": personId}
+		person        RelationShip
+		relationId, _ = primitive.ObjectIDFromHex(id)
+		filter        = bson.M{"_id": relationId}
 	)
 
 	err := pr.Connection.Collection(relationShipCollection).FindOne(context.TODO(), filter).Decode(&person)
@@ -101,6 +101,7 @@ func (pr *RelationShipRepositoryImpl) FindById(id string) (*RelationShip, *error
 }
 
 func (pr *RelationShipRepositoryImpl) Save(payload *RelationShip) (*RelationShip, *errorx.Error) {
+	payload.RelationID = primitive.NewObjectID()
 	_, err := pr.Connection.Collection(relationShipCollection).InsertOne(context.TODO(), payload)
 
 	if err != nil {
@@ -119,7 +120,8 @@ func (pr *RelationShipRepositoryImpl) Update(id string, payload *RelationShip) (
 
 	updateField := bson.M{
 		"$set": bson.M{
-			"_id":         payload.ParentID,
+			"_id":         payload.RelationID,
+			"parent_id":   payload.ParentID,
 			"children_id": payload.ChildrenID,
 		}}
 
