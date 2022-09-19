@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -25,7 +26,10 @@ func main() {
 	cfg := config.GetConfig()
 
 	//Db
-	db, _ := database.NewMongoDbClient(context.TODO(), cfg)
+	db, err := database.NewMongoDbClient(context.Background(), cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	//Repository
 	personRepository := person.NewPersonRepository(db)
