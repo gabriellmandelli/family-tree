@@ -44,18 +44,18 @@ func main() {
 	//Router
 	server := router.NewRouter()
 
+	healthCheck := router.NewRouter()
+
 	//Register
 	personHttp.Register(server)
 	relationshipHttp.Register(server)
 	familytreeHttp.Register(server)
 
-	go func() {
-		server.Logger.Fatal(server.Start(cfg.AppName))
-	}()
-
-	healthCheck := router.NewRouter()
-
 	health.NewHealthCheckHttp().Register(healthCheck)
+
+	go func() {
+		server.Logger.Fatal(server.Start(cfg.AppPort))
+	}()
 
 	go func() {
 		healthCheck.Logger.Fatal(healthCheck.Start(cfg.HealthPort))
