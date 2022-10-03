@@ -3,8 +3,8 @@ package person
 import (
 	"net/http"
 
-	"github.com/gabriellmandelli/family-tree/business/person"
-	util "github.com/gabriellmandelli/family-tree/foundation/context"
+	"github.com/gabriellmandelli/family-tree/internal/business/person"
+	util "github.com/gabriellmandelli/family-tree/internal/foundation/context"
 	"github.com/labstack/echo/v4"
 )
 

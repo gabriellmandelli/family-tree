@@ -3,7 +3,7 @@ package util
 import (
 	"context"
 
-	"github.com/gabriellmandelli/family-tree/foundation/model"
+	"github.com/gabriellmandelli/family-tree/internal/foundation/model"
 	"github.com/joomcode/errorx"
 	"github.com/labstack/echo/v4"
 )

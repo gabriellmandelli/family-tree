@@ -7,16 +7,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/gabriellmandelli/family-tree/adapter/config"
-	"github.com/gabriellmandelli/family-tree/adapter/database"
-	familyTreeHttp "github.com/gabriellmandelli/family-tree/adapter/http/familytree"
-	"github.com/gabriellmandelli/family-tree/adapter/http/health"
-	personHttp "github.com/gabriellmandelli/family-tree/adapter/http/person"
-	relationShipHttp "github.com/gabriellmandelli/family-tree/adapter/http/relationship"
-	"github.com/gabriellmandelli/family-tree/adapter/router"
-	"github.com/gabriellmandelli/family-tree/business/familytree"
-	"github.com/gabriellmandelli/family-tree/business/person"
-	"github.com/gabriellmandelli/family-tree/business/relationship"
+	"github.com/gabriellmandelli/family-tree/internal/adapter/config"
+	"github.com/gabriellmandelli/family-tree/internal/adapter/database"
+	familyTreeHttp "github.com/gabriellmandelli/family-tree/internal/adapter/http/familytree"
+	"github.com/gabriellmandelli/family-tree/internal/adapter/http/health"
+	personHttp "github.com/gabriellmandelli/family-tree/internal/adapter/http/person"
+	relationShipHttp "github.com/gabriellmandelli/family-tree/internal/adapter/http/relationship"
+	"github.com/gabriellmandelli/family-tree/internal/adapter/router"
+	"github.com/gabriellmandelli/family-tree/internal/business/familytree"
+	"github.com/gabriellmandelli/family-tree/internal/business/person"
+	"github.com/gabriellmandelli/family-tree/internal/business/relationship"
 )
 
 func main() {

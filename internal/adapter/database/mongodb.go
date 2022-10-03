@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gabriellmandelli/family-tree/adapter/config"
+	"github.com/gabriellmandelli/family-tree/internal/adapter/config"
 	"github.com/joomcode/errorx"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
