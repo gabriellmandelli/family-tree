@@ -6,11 +6,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-//HealthCheck struct
+// HealthCheck struct
 type HealthCheck struct {
 }
 
-//NewHealthCheckHttp return HealthCheck
+// NewHealthCheckHttp return HealthCheck
 func NewHealthCheckHttp() *HealthCheck {
 	return &HealthCheck{}
 }
@@ -19,7 +19,7 @@ const (
 	healthCheckBaseURL = "/health"
 )
 
-//Register register hc
+// Register register hc
 func (hc *HealthCheck) Register(server *echo.Echo) {
 	v1 := server.Group("v1")
 	v1.GET(healthCheckBaseURL, hc.getHealthCheck)

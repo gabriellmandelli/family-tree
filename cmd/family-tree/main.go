@@ -7,16 +7,18 @@ import (
 	"os/signal"
 	"syscall"
 
+	familyTreeHttp "github.com/gabriellmandelli/family-tree/internal/adapter/api/http/familytree"
+	healthHttp "github.com/gabriellmandelli/family-tree/internal/adapter/api/http/health"
+	personHttp "github.com/gabriellmandelli/family-tree/internal/adapter/api/http/person"
+	relationShipHttp "github.com/gabriellmandelli/family-tree/internal/adapter/api/http/relationship"
 	"github.com/gabriellmandelli/family-tree/internal/adapter/config"
 	"github.com/gabriellmandelli/family-tree/internal/adapter/database"
-	familyTreeHttp "github.com/gabriellmandelli/family-tree/internal/adapter/http/familytree"
-	"github.com/gabriellmandelli/family-tree/internal/adapter/http/health"
-	personHttp "github.com/gabriellmandelli/family-tree/internal/adapter/http/person"
-	relationShipHttp "github.com/gabriellmandelli/family-tree/internal/adapter/http/relationship"
-	"github.com/gabriellmandelli/family-tree/internal/adapter/router"
 	"github.com/gabriellmandelli/family-tree/internal/business/familytree"
 	"github.com/gabriellmandelli/family-tree/internal/business/person"
 	"github.com/gabriellmandelli/family-tree/internal/business/relationship"
+	"github.com/gabriellmandelli/family-tree/internal/foundation/http/router"
+	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func main() {
@@ -30,6 +32,30 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	//Router
+	serviceHttp := router.NewRouter()
+	metaHttp := router.NewRouter()
+
+	registerServices(db, serviceHttp, metaHttp)
+
+	go func() {
+		serviceHttp.Logger.Fatal(serviceHttp.Start(cfg.AppPort))
+	}()
+
+	go func() {
+		metaHttp.Logger.Fatal(metaHttp.Start(cfg.HealthPort))
+	}()
+
+	osSignalChan := make(chan os.Signal, 2)
+	signal.Notify(osSignalChan, os.Interrupt, syscall.SIGTERM)
+	switch <-osSignalChan {
+	case os.Interrupt:
+	case syscall.SIGTERM:
+	}
+}
+
+func registerServices(db *mongo.Database, serviceHttp *echo.Echo, metaHttp *echo.Echo) {
 
 	//Repository
 	personRepository := person.NewPersonRepository(db)
@@ -45,30 +71,12 @@ func main() {
 	relationshipHttp := relationShipHttp.NewRelationShipHttp(relationshipService)
 	familytreeHttp := familyTreeHttp.NewFamilyTreeHttp(familyTreeService)
 
-	//Router
-	server := router.NewRouter()
-
-	healthCheck := router.NewRouter()
+	healtCheckhHttp := healthHttp.NewHealthCheckHttp()
 
 	//Register
-	personHttp.Register(server)
-	relationshipHttp.Register(server)
-	familytreeHttp.Register(server)
+	personHttp.Register(serviceHttp)
+	relationshipHttp.Register(serviceHttp)
+	familytreeHttp.Register(serviceHttp)
 
-	health.NewHealthCheckHttp().Register(healthCheck)
-
-	go func() {
-		server.Logger.Fatal(server.Start(cfg.AppPort))
-	}()
-
-	go func() {
-		healthCheck.Logger.Fatal(healthCheck.Start(cfg.HealthPort))
-	}()
-
-	osSignalChan := make(chan os.Signal, 2)
-	signal.Notify(osSignalChan, os.Interrupt, syscall.SIGTERM)
-	switch <-osSignalChan {
-	case os.Interrupt:
-	case syscall.SIGTERM:
-	}
+	healtCheckhHttp.Register(metaHttp)
 }
