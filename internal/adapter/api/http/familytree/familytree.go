@@ -1,19 +1,19 @@
-package familytree
+package http
 
 import (
 	"net/http"
 
-	"github.com/gabriellmandelli/family-tree/business/familytree"
-	util "github.com/gabriellmandelli/family-tree/foundation/context"
+	"github.com/gabriellmandelli/family-tree/internal/business/familytree"
+	util "github.com/gabriellmandelli/family-tree/internal/foundation/context"
 	"github.com/labstack/echo/v4"
 )
 
-//FamilyTree struct
+// FamilyTree struct
 type FamilyTree struct {
 	rsService familytree.FamilyTreeService
 }
 
-//NewFamilyTree return Person ft
+// NewFamilyTree return Person ft
 func NewFamilyTreeHttp(familytreeService familytree.FamilyTreeService) *FamilyTree {
 	return &FamilyTree{
 		rsService: familytreeService,
@@ -24,7 +24,7 @@ const (
 	familyTreeBaseUrl = "/familytree"
 )
 
-//Register register controllers
+// Register register controllers
 func (ft *FamilyTree) Register(server *echo.Echo) {
 	v1 := server.Group("v1")
 	v1.GET(familyTreeBaseUrl+"/:personID", ft.findAll)

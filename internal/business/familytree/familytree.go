@@ -3,8 +3,8 @@ package familytree
 import (
 	"context"
 
-	"github.com/gabriellmandelli/family-tree/business/person"
-	"github.com/gabriellmandelli/family-tree/business/relationship"
+	"github.com/gabriellmandelli/family-tree/internal/business/person"
+	"github.com/gabriellmandelli/family-tree/internal/business/relationship"
 	"github.com/joomcode/errorx"
 )
 

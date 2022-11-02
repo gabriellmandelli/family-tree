@@ -21,13 +21,13 @@ build-docker: ## build the API server as a docker image
 rebuild-env: stop-env destroy-env build-env start-env
 
 start-env:
-	docker-compose -f ./deployments/docker/localstack/docker-compose-local.yml  up
+	docker compose -f ./deployments/docker/localstack/docker-compose-local.yml  up
 
 stop-env:
-	docker-compose -f ./deployments/docker/localstack/docker-compose-local.yml  stop
+	docker compose -f ./deployments/docker/localstack/docker-compose-local.yml  stop
 
 destroy-env:
-	docker-compose -f ./deployments/docker/localstack/docker-compose-local.yml  rm -f
+	docker compose -f ./deployments/docker/localstack/docker-compose-local.yml  rm -f
 
 build-env:
-	docker-compose -f ./deployments/docker/localstack/docker-compose-local.yml  build
+	docker compose -f ./deployments/docker/localstack/docker-compose-local.yml  build

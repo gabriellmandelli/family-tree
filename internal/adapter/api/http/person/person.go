@@ -3,17 +3,17 @@ package person
 import (
 	"net/http"
 
-	"github.com/gabriellmandelli/family-tree/business/person"
-	util "github.com/gabriellmandelli/family-tree/foundation/context"
+	"github.com/gabriellmandelli/family-tree/internal/business/person"
+	util "github.com/gabriellmandelli/family-tree/internal/foundation/context"
 	"github.com/labstack/echo/v4"
 )
 
-//Person struct
+// Person struct
 type Person struct {
 	personService person.PersonService
 }
 
-//NewPersonHttp return Person p
+// NewPersonHttp return Person p
 func NewPersonHttp(personService person.PersonService) *Person {
 	return &Person{
 		personService: personService,
@@ -24,7 +24,7 @@ const (
 	personBaseUrl = "/person"
 )
 
-//Register register controllers
+// Register register controllers
 func (controller *Person) Register(server *echo.Echo) {
 	v1 := server.Group("v1")
 	v1.GET(personBaseUrl, controller.findAll)
