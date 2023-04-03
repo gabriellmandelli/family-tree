@@ -24,34 +24,47 @@ func NewFamilyTreeService(personService person.PersonService, relationShipServic
 	}
 }
 
+func convert(input []*string) []string {
+	output := make([]string, len(input))
+	for i, v := range input {
+		output[i] = *v
+	}
+	return output
+}
+
 func (ft *FamilyTreeServiceImpl) GetFamilyTree(ctx context.Context, personID string) (*FamilyTree, *errorx.Error) {
 	familyTree := FamilyTree{}
-	queryPerson := []string{}
+	var queryPerson []*string
 
-	relationsShips, errx := ft.relationShipService.FindAll(ctx, "", "")
-
-	if errx != nil {
-		return &familyTree, errx
+	relationsShips, ex := ft.relationShipService.FindAll(ctx, "", "")
+	if ex != nil {
+		return &familyTree, ex
 	}
 
-	ft.parentsOfParents(&familyTree.Members, personID, queryPerson, relationsShips)
-	ft.childrenOfChildres(&familyTree.Members, personID, queryPerson, relationsShips)
+	ft.parentsOfParents(&familyTree.Members, personID, &queryPerson, relationsShips)
+	ft.childrenOfChildres(&familyTree.Members, personID, &queryPerson, relationsShips)
 
-	personData, errx := ft.personService.FindInBatch(ctx, queryPerson)
-
-	if errx != nil {
-		return &familyTree, errx
+	personData, ex := ft.personService.FindInBatch(ctx, convert(queryPerson))
+	if ex != nil {
+		return &familyTree, ex
 	}
 
-	ft.updatePersonInfo(&familyTree.Members, personData)
+	for _, p := range personData {
+		member := familyTree.Members.searchMember(p.ID.Hex())
+		if member != nil {
+			member.Name = p.Name
+		}
+	}
 
 	return &familyTree, nil
 }
 
-func (ft *FamilyTreeServiceImpl) parentsOfParents(member *Members, memberID string, queryPerson []string, relationsShips []relationship.RelationShip) {
+func (ft *FamilyTreeServiceImpl) parentsOfParents(member *Members, memberID string, queryPerson *[]*string, relationsShips []relationship.RelationShip) {
 	member.ID = memberID
 	member.Parents = make([]Members, 0)
-	queryPerson = append(queryPerson, memberID)
+
+	*queryPerson = append(*queryPerson, &memberID)
+
 	for _, relation := range relationsShips {
 		if memberID == relation.ChildrenID.Hex() {
 			parent := Members{}
@@ -62,11 +75,14 @@ func (ft *FamilyTreeServiceImpl) parentsOfParents(member *Members, memberID stri
 	}
 }
 
-func (ft *FamilyTreeServiceImpl) childrenOfChildres(member *Members, memberID string, queryPerson []string, relationsShips []relationship.RelationShip) {
+func (ft *FamilyTreeServiceImpl) childrenOfChildres(member *Members, memberID string, queryPerson *[]*string, relationsShips []relationship.RelationShip) {
 	member.ID = memberID
 	member.Childrens = make([]Members, 0)
-	queryPerson = append(queryPerson, memberID)
+
+	*queryPerson = append(*queryPerson, &memberID)
+
 	for _, relation := range relationsShips {
+
 		if memberID == relation.ParentID.Hex() {
 			children := Members{}
 			children.ID = relation.ChildrenID.Hex()
@@ -76,17 +92,25 @@ func (ft *FamilyTreeServiceImpl) childrenOfChildres(member *Members, memberID st
 	}
 }
 
-func (ft *FamilyTreeServiceImpl) updatePersonInfo(members *Members, personData []person.Person) {
-	for i := range personData {
-		if members.ID == personData[i].ID.Hex() {
-			members.Name = personData[i].Name
+func (members *Members) searchMember(id string) *Members {
+	if members.ID == id {
+		return members
+	}
+	if len(members.Parents) > 0 {
+		for i := range members.Parents {
+			member := members.Parents[i].searchMember(id)
+			if member != nil {
+				return member
+			}
 		}
 	}
-	for i := range members.Parents {
-		ft.updatePersonInfo(&members.Parents[i], personData)
+	if len(members.Childrens) > 0 {
+		for i := range members.Childrens {
+			member := members.Childrens[i].searchMember(id)
+			if member != nil {
+				return member
+			}
+		}
 	}
-
-	for i := range members.Childrens {
-		ft.updatePersonInfo(&members.Childrens[i], personData)
-	}
+	return nil
 }
