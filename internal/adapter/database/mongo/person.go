@@ -3,6 +3,7 @@ package person
 import (
 	"context"
 
+	"github.com/gabriellmandelli/family-tree/internal/business/person"
 	"github.com/joomcode/errorx"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -14,22 +15,17 @@ const (
 	personCollection = "person"
 )
 
-type PersonRepository interface {
-	Count() (int64, *errorx.Error)
-	FindInBatch(ctx context.Context, personIDs []string) ([]Person, *errorx.Error)
-	FindAll(name string, limit int64, offset int64) ([]Person, *errorx.Error)
-	FindById(id string) (*Person, *errorx.Error)
-	Save(payload *Person) (*Person, *errorx.Error)
-	Update(id string, payload *Person) (*Person, *errorx.Error)
-	Delete(id string) *errorx.Error
+type Person struct {
+	ID   primitive.ObjectID `bson:"_id"`
+	Name string             `bson:"name"`
 }
 
 type PersonRepositoryImpl struct {
 	Connection *mongo.Database
 }
 
-func NewPersonRepository(Connection *mongo.Database) PersonRepository {
-	return &PersonRepositoryImpl{Connection: Connection}
+func NewPersonRepository(db *mongo.Database) person.PersonService {
+	return &PersonRepositoryImpl{Connection: db}
 }
 
 func (pr *PersonRepositoryImpl) Count() (int64, *errorx.Error) {
@@ -42,10 +38,10 @@ func (pr *PersonRepositoryImpl) Count() (int64, *errorx.Error) {
 	return countRecord, nil
 }
 
-func (pr *PersonRepositoryImpl) FindInBatch(ctx context.Context, personIDs []string) ([]Person, *errorx.Error) {
+func (pr *PersonRepositoryImpl) FindInBatch(ctx context.Context, personIDs []string) ([]person.Person, *errorx.Error) {
 	var (
-		person        Person
-		persons       []Person
+		person        person.Person
+		persons       []person.Person
 		filterOptions = options.Find()
 		csr           *mongo.Cursor
 		errorCsr      error
@@ -83,10 +79,10 @@ func (pr *PersonRepositoryImpl) FindInBatch(ctx context.Context, personIDs []str
 	return persons, nil
 }
 
-func (pr *PersonRepositoryImpl) FindAll(name string, limit int64, offset int64) ([]Person, *errorx.Error) {
+func (pr *PersonRepositoryImpl) FindAll(name string, limit int64, offset int64) ([]person.Person, *errorx.Error) {
 	var (
-		person        Person
-		persons       []Person
+		person        person.Person
+		persons       []person.Person
 		filterOptions = options.Find()
 		csr           *mongo.Cursor
 		errorCsr      error
@@ -120,7 +116,7 @@ func (pr *PersonRepositoryImpl) FindAll(name string, limit int64, offset int64) 
 	return persons, nil
 }
 
-func (pr *PersonRepositoryImpl) FindById(id string) (*Person, *errorx.Error) {
+func (pr *PersonRepositoryImpl) FindById(id string) (*person.Person, *errorx.Error) {
 	var (
 		person      Person
 		personId, _ = primitive.ObjectIDFromHex(id)
